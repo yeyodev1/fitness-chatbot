@@ -9,16 +9,20 @@ import { orderFlow } from "src/flows/order.flow"
 export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods) => {
   const ai = extensions.ai as AIClass
   const history = getHistoryParse(state)
-  const prompt =`{history}
+  const prompt =
+  `
   Deberás analizar detenidamente el historial de conversación para identificar señales clave que indiquen la intención del cliente. Las señales pueden incluir, pero no se limitan a, preguntas específicas sobre productos, solicitudes de recomendaciones, inquietudes sobre opciones de pago, y expresiones directas de deseo de comprar.
   
   Posibles acciones a realizar:
   
-  1. ORDENAR: Selecciona esta opción cuando el cliente muestre interés en explorar productos, pregunte por precios, o exprese el deseo de añadir algo a su carrito. Esto indica que el cliente está en la fase de consideración y posiblemente preparándose para realizar una compra.
-  2. CONVERSAR: Opta por esta acción cuando el cliente busque más información, tenga dudas específicas sobre un producto o servicio, o simplemente quiera hablar más sobre lo que ofrece la tienda. Esto sugiere que el cliente aún está explorando y no se ha decidido por una compra.
-  3. CONFIRMAR: Esta acción es apropiada cuando el cliente da pasos concretos hacia la finalización de su compra, como preguntar "¿Cómo puedo pagar?", mostrar interés en procedimientos de pago, o indicar de manera explícita que desea finalizar su pedido.
+  1. ORDENAR: Selecciona esta opción cuando el cliente muestre interés en explorar productos, pregunte por precios, o exprese el deseo de añadir algo a su carrito. En pocas palabras el cliente aun se encuentra o explorando productos, o consultando precios, o queriendo comprar mas.
+  2. CONVERSAR: Opta por esta acción cuando el cliente busque más información, tenga dudas específicas sobre un producto o servicio, o simplemente quiera hablar más sobre lo que ofrece la tienda o desea saber que es lo que tiene la tienda. Esto sugiere que el cliente aún está explorando y no se ha decidido por una compra.
+  3. CONFIRMAR: Esta acción es apropiada cuando el cliente da pasos a entender que ya desea pagar. Por ejemplo, se expresa que ya no desea pedir nada mas, o que simplemente desea ya pagar.
+
   Tu objetivo es comprender profundamente la intención detrás de las palabras del cliente y responder con la acción más adecuada, garantizando así una interacción efectiva y eficiente.
   
+  Esto dijo el cliente: {HISTORY}
+
   Respuesta ideal (ORDENAR|CONVERSAR|CONFIRMAR):`.replace('{HISTORY}', history)
 
   console.log('historial de main layer: ', history)
@@ -28,7 +32,6 @@ export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods
       content: prompt
     }
   ])
-
 console.log('text de main layer: ', text )
  try {
     if (text.includes('CONVERSAR')) {
