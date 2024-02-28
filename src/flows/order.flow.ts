@@ -6,6 +6,8 @@ import AIClass from "src/ai/ai.class";
 const generatePromptOrderTaker = (history: string) => {
 	const prompt = `Como asistente virtual de la tienda "fitness tienda", tu rol es tomar la orden del cliente, solo ofrecerás lo que hay en el catalogo, si no hay nada acerca de lo que el cliente dice tu dirás que no tenemos eso, cada que el cliente agregue un item preguntarás si quiere algo más, cuando diga que no dirás que confirme la orden, si te piden el catalogo envialo completamente en una lista.
 
+	tu nunca saludarás, solo preguntarás que desea ordenar, nunca saludes
+
 
   HISTORIAL DE CONVERSACIÓN:
   -------------------------------------

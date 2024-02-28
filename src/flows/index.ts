@@ -6,7 +6,6 @@ import { orderFlow } from "./order.flow";
 
 export const flow = createFlow([
   confirmFlow,
-  confirmFlow,
   orderFlow,
   welcomeFlow,
   conversationFlow
