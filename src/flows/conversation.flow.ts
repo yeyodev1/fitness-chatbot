@@ -1,6 +1,7 @@
 import { EVENTS, addKeyword } from "@bot-whatsapp/bot";
-import { getHistoryParse, handleHistory } from "src/utils/handleHistory";
+
 import AIClass from "src/ai/ai.class";
+import { getHistoryParse, handleHistory } from "src/utils/handleHistory";
 
 console.log('entramos en conversation.flow.ts')
 

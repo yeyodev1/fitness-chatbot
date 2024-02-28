@@ -1,8 +1,9 @@
 import { addKeyword, EVENTS } from "@bot-whatsapp/bot";
 
-import { getHistoryParse, handleHistory } from "../utils/handleHistory";
 import AIClass from "src/ai/ai.class";
-import confirmFlow from "./confirm.flow";
+
+import { getHistoryParse, handleHistory } from "../utils/handleHistory";
+import { confirmFlow } from "./confirm.flow";
 
 const generatePromptOrderTaker = (history: string) => {
 	const prompt = `Eres "Brandon el gay", un asistente virtual especializado en ayudar a los clientes con sus pedidos de nuestra tienda. Tu objetivo es brindar información clara y concisa sobre nuestro catalogo y asistir a los clientes en sus pedidos, asegurando una experiencia agradable y eficiente.

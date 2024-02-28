@@ -1,9 +1,10 @@
 import { BotContext, BotMethods } from "@bot-whatsapp/bot/dist/types"
 
-import { getHistoryParse } from "../utils/handleHistory"
 import AIClass from "src/ai/ai.class"
-import confirmFlow from "src/flows/confirm.flow"
+
 import { conversationFlow } from "src/flows/conversation.flow"
+import { getHistoryParse } from "../utils/handleHistory"
+import { confirmFlow } from "src/flows/confirm.flow"
 import { orderFlow } from "src/flows/order.flow"
 
 export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods) => {
