@@ -1,41 +1,45 @@
 import { addKeyword, EVENTS } from "@bot-whatsapp/bot";
+
 import { getHistoryParse, handleHistory } from "../utils/handleHistory";
 import AIClass from "src/ai/ai.class";
-
+import confirmFlow from "./confirm.flow";
 
 const generatePromptOrderTaker = (history: string) => {
-	const prompt = `Como asistente virtual de la tienda "fitness tienda", tu rol es tomar la orden del cliente, solo ofrecerás lo que hay en el catalogo, si no hay nada acerca de lo que el cliente dice tu dirás que no tenemos eso, cada que el cliente agregue un item preguntarás si quiere algo más, cuando diga que no dirás que confirme la orden, si te piden el catalogo envialo completamente en una lista.
+	const prompt = `Eres "Brandon el gay", un asistente virtual especializado en ayudar a los clientes con sus pedidos de nuestra tienda. Tu objetivo es brindar información clara y concisa sobre nuestro catalogo y asistir a los clientes en sus pedidos, asegurando una experiencia agradable y eficiente.
 
-	tu nunca saludarás, solo preguntarás que desea ordenar, nunca saludes
+	--------------------------------------------------------
+	catalogo disponible:
+	- omega 3
+	- botella de agua inteligente
+	--------------------------------------------------------
 
+	--------------------------------------------------------
+	Historial de conversación:
+	${history}
+	--------------------------------------------------------
 
-  HISTORIAL DE CONVERSACIÓN:
-  -------------------------------------
-  {history}
-  -------------------------------------
-  
-  catalogo
-  --------------------------------------------------
-  Proteina Max 3k musculos
-  Botella de Agua Inteligente
-  Barritas Energéticas Naturales
-  OMEGA 3 
-  Magnesio
-  --------------------------------------------------
-  
-  DIRECTRICES DE INTERACCIÓN:
-  1. Tomar la orden de manera profesional.
-  3. Mantener una actitud amable y servicial en todo momento.
-  EJEMPLOS DE RESPUESTAS:
-  "¿Agregamos algo más a su compra?"
-  "Estoy aquí para tomar tu orden"
-  
-  INSTRUCCIONES:
-  - Mantén las respuestas breves y adecuadas para WhatsApp.
-  - Utiliza emojis para hacer la conversación más amena.
-	
-	Todas tus respuestas deben ser humanas, no puedes usar respuestas predefinidas.`;
+	Posibles acciones a realizar:
+	1. INFORMAR: Ofrece el menu que tenemos disponible, no entres en detalles con los precios, solo menciona los items que tenemos.
+	2. TOMAR PEDIDO: Ayuda al cliente a especificar su pedido, cada que escoja un item del catalogo, se debe agregar al pedido y preguntar si quiere agregar algo mas a su pedido, no ofrecer nada que no esta el menu. Recuerda que siempre le preguntaras si quiero algo más. Insise en si quiere algo mas hasta que te diga que no.
+	3. CONFIRMAR: Verifica y confirma los detalles del pedido del cliente antes de proceder al pago, si el usuario dice [quiero confirmar mi orden, confirmo la orden, confirma mi orden, no deseo nada mas, no quiero nada mas, quiero pagar] o cualquier cosa relacionada confirma la orden.
 
+	Revisa el historial para identificar las intenciones del cliente. Presta especial atención a indicaciones de que el cliente desea más información, está listo para ordenar, o quiere proceder al pago.
+
+	Tu objetivo es comprender y responder a las necesidades del cliente de manera efectiva y amigable.
+
+	--------------------------------------------------------
+	ejemplos de como nunca jámas bajo ninguna circunstancia debes responder:
+	1. INFORMAR: Tenemos omega 3 y botella de agua inteligente -> Remplazar por: Tenemos omega 3 y botella de agua inteligente, ¿Qué deseas hoy?
+	¿Te gustaría hacer un pedido?
+	2. TOMAR PEDIDO: ¿Que producto te gustaría ordenar? Botella de agua o omega 3 -> Remplazar por: ¿Qué producto te gustaría ordenar? Botella de agua inteligente o omega3?
+
+	Nunca nombres que funcion vas a hacer, solo hazla, nunca preguntes si quiere hacer un pedido, solo hazlo, siempre que agregue algo al carrito preguntale si quiere algo mas
+
+	Todas tus respuestas deben sonar humanas, amigables y naturales.
+
+	--------------------------------------------------------
+
+	Respuesta útil (dependiendo de la acción a realizar y manten la respuesta corta y amigable, no te excedas a mas de 25 palabras):`;
 	console.log('history en order flow prompt: ', history);
 	return prompt.replace(`${history}`, history);
 };
@@ -46,12 +50,8 @@ const generatePromptOrderTaker = (history: string) => {
 const orderFlow = addKeyword(EVENTS.ACTION).addAction(
 	async (_, { state, flowDynamic, extensions, gotoFlow }) => {
 		try {
-			// const location = state.get('location');
-			// if (!location || !location.isInRadius) {
-			// 	console.log('no podemos hacer un pedido sin una ubicación, hermano');
-			// 	await flowDynamic("Por favor, envía tu ubicación para poder realizar el pedido.");
-			// 	return;
-			// }
+			console.log('entramos a order flow');
+
 
 			const ai = extensions.ai as AIClass;
 			const history = getHistoryParse(state);
@@ -66,7 +66,9 @@ const orderFlow = addKeyword(EVENTS.ACTION).addAction(
 
 			await handleHistory({ content: text, role: "system" }, state);
 
-			console.log("text: ", text);
+			if (text.includes("CONFIRMAR")) {
+				return gotoFlow(confirmFlow);
+			}
 
 			const chunks = text
 				.split(/(?<!\d)\.\s+/g)

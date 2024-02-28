@@ -15,11 +15,13 @@ export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods
   
   Posibles acciones a realizar:
   
-  1. ORDENAR: Selecciona esta opción cuando el cliente muestre interés en explorar productos, pregunte por precios, o exprese el deseo de añadir algo a su carrito. En pocas palabras el cliente aun se encuentra o explorando productos, o consultando precios, o queriendo comprar mas.
-  2. CONVERSAR: Opta por esta acción cuando el cliente busque más información, tenga dudas específicas sobre un producto o servicio, o simplemente quiera hablar más sobre lo que ofrece la tienda o desea saber que es lo que tiene la tienda. Esto sugiere que el cliente aún está explorando y no se ha decidido por una compra.
+  1. ORDENAR: Selecciona esta opción cuando el cliente muestre interés en explorar productos, pregunte por precios, o exprese el deseo de añadir algo a su carrito. En pocas palabras el cliente aun se encuentra o explorando productos, o consultando precios, o queriendo comprar mas(si quiere ver productos o catalogo esta es la intencion).
+  2. CONVERSAR: Opta por esta acción cuando el cliente busque más información, tenga dudas específicas sobre un producto o servicio, o simplemente quiera hablar más sobre lo que ofrece la tienda o desea saber que es lo que tiene la tienda. Esto sugiere que el cliente aún está explorando y no se ha decidido por una compra(esta no es la intención si quiere ver productos o catalogo).
   3. CONFIRMAR: Esta acción es apropiada cuando el cliente da pasos a entender que ya desea pagar. Por ejemplo, se expresa que ya no desea pedir nada mas, o que simplemente desea ya pagar.
 
   Tu objetivo es comprender profundamente la intención detrás de las palabras del cliente y responder con la acción más adecuada, garantizando así una interacción efectiva y eficiente.
+
+  Si el cliente pregunta por el catálogo, envíalo a ORDENAR
   
   Esto dijo el cliente: {HISTORY}
 
