@@ -4,14 +4,15 @@ import AIClass from "src/ai/ai.class";
 
 import { getHistoryParse, handleHistory } from "../utils/handleHistory";
 import { confirmFlow } from "./confirm.flow";
+import GoogleSheetService from "src/services/sheet.js";
 
-const generatePromptOrderTaker = (history: string) => {
-	const prompt = `Eres "Brandon el gay", un asistente virtual especializado en ayudar a los clientes con sus pedidos de nuestra tienda. Tu objetivo es brindar información clara y concisa sobre nuestro catalogo y asistir a los clientes en sus pedidos, asegurando una experiencia agradable y eficiente.
+
+const generatePromptOrderTaker = (history: string, products: string) => {
+	const prompt = `Eres "Brandon", un asistente virtual especializado en ayudar a los clientes con sus pedidos de nuestra tienda. Tu objetivo es brindar información clara y concisa sobre nuestro catalogo y asistir a los clientes en sus pedidos, asegurando una experiencia agradable y eficiente. el cliente ya sabe el catalogo previamente, considera esto para conversar con el cliente. Tu siempre iniciarás con el catalogo en una lista ordenada, siempre lo harás, el cliente no lo conoce hasta que lo das. preguntarás si quiere agregar algo y si ya escogio algo previamente preguntarás si quiere algo más, si dice que no insiste en que confirme la orden
 
 	--------------------------------------------------------
 	catalogo disponible:
-	- omega 3
-	- botella de agua inteligente
+	${products}
 	--------------------------------------------------------
 
 	--------------------------------------------------------
@@ -42,21 +43,26 @@ const generatePromptOrderTaker = (history: string) => {
 
 	Respuesta útil (dependiendo de la acción a realizar y manten la respuesta corta y amigable, no te excedas a mas de 25 palabras):`;
 	console.log('history en order flow prompt: ', history);
-	return prompt.replace(`${history}`, history);
+	return prompt.replace('${products}', products).replace('${history}', history);
 };
 
 
-
+const googleSheet = new GoogleSheetService(
+	"1YgBJtpwwtfJlUzgzuPS-M6Z2CMGXvhFZ90ojH6300fs"
+);
 
 const orderFlow = addKeyword(EVENTS.ACTION).addAction(
 	async (_, { state, flowDynamic, extensions, gotoFlow }) => {
 		try {
-			console.log('entramos a order flow');
 
+			const history = getHistoryParse(state);
+
+			const products = await googleSheet.getAllProducts();
+			const productsString = products.map(p => `${p.NAME} a ${p.PRICE}`).join('\n ');
+			console.log('productos: ', productsString);
 
 			const ai = extensions.ai as AIClass;
-			const history = getHistoryParse(state);
-			const prompt = generatePromptOrderTaker(history);
+			const prompt = generatePromptOrderTaker(history, productsString);
 
 			const text = await ai.createChat([
 				{
