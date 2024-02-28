@@ -141,7 +141,7 @@ const confirmFlow = addKeyword("pay")
 		clearHistory(state);
 		console.log('Historial de conversación limpio', state.getAllState())
 
-		await flowDynamic('Listo!, tu pedido llegará en unos minutos. Gracias por tu compra! 🍕🚀🎉')
+		await flowDynamic('Listo!, tu pedido se agendó, pronto un agente se contactará contigo para hacer la entrega. Gracias por tu compra! 🍕🚀🎉')
 	});
 
 export { confirmFlow };
