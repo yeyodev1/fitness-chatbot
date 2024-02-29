@@ -6,6 +6,7 @@ import { conversationFlow } from "src/flows/conversation.flow"
 import { getHistoryParse } from "../utils/handleHistory"
 import { confirmFlow } from "src/flows/confirm.flow"
 import { orderFlow } from "src/flows/order.flow"
+import { trainingFlow } from "src/flows/training.flow"
 
 export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods) => {
   const ai = extensions.ai as AIClass
@@ -19,6 +20,7 @@ export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods
   1. ORDENAR: Selecciona esta opción cuando el cliente muestre interés en explorar productos, pregunte por precios, o exprese el deseo de añadir algo a su carrito. En pocas palabras el cliente aun se encuentra o explorando productos, o consultando precios, o queriendo comprar mas(si quiere ver productos o catalogo esta es la intencion).
   2. CONVERSAR: Opta por esta acción cuando el cliente busque más información, tenga dudas específicas sobre un producto o servicio, o simplemente quiera hablar más sobre lo que ofrece la tienda o desea saber que es lo que tiene la tienda. Esto sugiere que el cliente aún está explorando y no se ha decidido por una compra(esta no es la intención si quiere ver productos o catalogo).
   3. CONFIRMAR: Esta acción es apropiada cuando el cliente da pasos a entender que ya desea pagar. Por ejemplo, se expresa que ya no desea pedir nada mas, o que simplemente desea ya pagar.
+  4. ENTRENAR: Si el cliente pregunta por entrenamiento o rutina, envíalo a ENTRENAR, si pide algo relacionado con entrenamiento o rutina, envíalo a ENTRENAR.
 
   Tu objetivo es comprender profundamente la intención detrás de las palabras del cliente y responder con la acción más adecuada, garantizando así una interacción efectiva y eficiente.
 
@@ -26,7 +28,7 @@ export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods
   
   Esto dijo el cliente: {HISTORY}
 
-  Respuesta ideal (ORDENAR|CONVERSAR|CONFIRMAR):`.replace('{HISTORY}', history)
+  Respuesta ideal (ORDENAR|CONVERSAR|CONFIRMAR|ENTRENAR):`.replace('{HISTORY}', history)
 
   console.log('historial de main layer: ', history)
   const text = await ai.createChat([
@@ -48,6 +50,10 @@ console.log('text de main layer: ', text )
     if (text.includes('CONFIRMAR')) {
         console.log('Flow Triggered: CONFIRMAR');
         return gotoFlow(confirmFlow);
+    }
+    if(text.includes('ENTRENAR')){
+      console.log('Flow Triggered: ENTRENAR');
+      return gotoFlow(trainingFlow);
     }
   } catch (err) {
     console.log(`[ERROR]:`, err);
