@@ -167,7 +167,7 @@ const confirmFlow = addKeyword("pay")
 				email: email,
 				identification: identification,
 				cellphone: cellphone,
-				orderItems: client.orderItems,
+				orderItems: client.orderItems.map((item: { name: any; quantity: any; price: any; }) => `Nombre: ${item.name}, cantidad: ${item.quantity}, precio: ${item.price}`).join(', ').replace(/"/g, ''),
 			}
 			console.log('data from flow', data);
 			await googleSheet.saveOrder(data);

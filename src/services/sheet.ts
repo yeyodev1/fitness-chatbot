@@ -77,7 +77,7 @@ class GoogleSheetService {
 				email: data.email,
 				identification: data.identification,
 				cellphone: data.cellphone,
-				orderItems: data.orderItems,
+				orderItems: JSON.stringify(data.orderItems),
 			});
 			console.log("el order ha sido enviado", order);
 			return order;
