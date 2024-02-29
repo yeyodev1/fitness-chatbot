@@ -5,10 +5,18 @@ import {
 	handleHistory,
 	getHistoryParse,
 } from "../utils/handleHistory";
+import GoogleSheetService from "src/services/sheet.js";
 
-const generateJsonParseForPayment = (history: any, name: string, email: string, identificacion: string, cellphone: string) => {
-	const prompt = `Basado en el historial de conversación: ${history}s
+const googleSheet = new GoogleSheetService(
+	"1YgBJtpwwtfJlUzgzuPS-M6Z2CMGXvhFZ90ojH6300fs"
+);
+
+const generateJsonParseForPayment = (history: any, name: string, email: string, identificacion: string, cellphone: string, products: any) => {
+	const prompt = `Basado en el historial de conversación: ${history}
     Analiza la información proporcionada y genera un objeto JSON para el proceso de pago, estrictamente siempre debera tener la siguente sintaxis en ingles.
+
+		el json lo harás comparando esos datos con los siguientes datos siempre con estos datos guardarás el pedido, con el precio y nombre correspondiente
+		${products}
 
 		--------------------------------------------------------
 		ejemplo de sintaxis
@@ -19,7 +27,7 @@ const generateJsonParseForPayment = (history: any, name: string, email: string, 
 				cellphone: "1234567890"
 				orderItems: [
 					{
-						name: "Pizza de pepperoni",
+						name: "Omega 3",
 						quantity: 1,
 						price: 10.00
 					}
@@ -122,26 +130,57 @@ const confirmFlow = addKeyword("pay")
 		const email = state.get("email");
 		const name = state.get("name");
 		const identification = state.get("identification");
-		const cellphone = ctx.from
-
+		const cellphone = ctx.from; 
+		const products = await googleSheet.getAllProducts();
+		
+		
+		const productsString = products.map(p => `${p.NAME} a ${p.PRICE}`).join('\n ');
+	
 		const history = getHistoryParse(state);
-		console.log('historial', history)
+		console.log('historial', history);
+		
 		const ai = extensions.ai as AIClass;
 		const prompt = generateJsonParseForPayment(
 			history,
 			name,
 			email,
 			identification,
-			cellphone
+			cellphone,
+			productsString,
 		);
+	
+		
 		const jsonPaymentInfo = await ai.createChat([
 			{ role: "system", content: prompt },
 		]);
-		console.log(`JSON para Pago: ${jsonPaymentInfo}`);
-		clearHistory(state);
-		console.log('Historial de conversación limpio', state.getAllState())
 
-		await flowDynamic('Listo!, tu pedido se agendó, pronto un agente se contactará contigo para hacer la entrega. Gracias por tu compra! 🍕🚀🎉')
+
+		console.log(`JSON para Pago:...... \n ${jsonPaymentInfo}`);
+		const paymentInfo = JSON.parse(jsonPaymentInfo);
+		const client = paymentInfo.client;
+
+		console.log('client', client);
+
+		try {
+			const data = {
+				name: name,
+				email: email,
+				identification: identification,
+				cellphone: cellphone,
+				orderItems: client.orderItems,
+			}
+			console.log('data from flow', data);
+			await googleSheet.saveOrder(data);
+		} catch (error) {
+			console.error("Error al guardar la orden:", error);
+		}
+		
+		// clearHistory(state);
+		console.log('Historial de conversación limpio', state.getAllState());
+	
+		
+		await flowDynamic('Listo!, tu pedido se agendó, pronto un agente se contactará contigo para hacer la entrega. Gracias por tu compra! 🍕🚀🎉');
 	});
+	
 
 export { confirmFlow };
