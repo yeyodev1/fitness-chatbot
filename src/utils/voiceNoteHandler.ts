@@ -7,16 +7,16 @@ import { convertOggMp3 } from 'src/utils/convert';
 const handlerAI = async (ctx: any) => {
   let pathTmpOgg: string, pathTmpMp3: string; 
   try {
-    const buffer = await downloadMediaMessage(ctx, "buffer", {} );
+    const buffer = await downloadMediaMessage(ctx, "buffer", {});
     pathTmpOgg = `${process.cwd()}/src/tmp/voice-note-${Date.now()}.ogg`;
     pathTmpMp3 = `${process.cwd()}/src/tmp/voice-note-${Date.now()}.mp3`;
     await fs.writeFile(pathTmpOgg, buffer);
     await convertOggMp3(pathTmpOgg, pathTmpMp3);
     const text = await voiceToText(pathTmpMp3);
-   
     
     await fs.unlink(pathTmpOgg);
     await fs.unlink(pathTmpMp3);
+
 
     return text;
     

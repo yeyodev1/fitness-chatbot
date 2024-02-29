@@ -7,6 +7,7 @@ import { getHistoryParse } from "../utils/handleHistory";
 import { confirmFlow } from "src/flows/confirm.flow";
 import { orderFlow } from "src/flows/order.flow";
 import { trainingFlow } from "src/flows/training.flow";
+import { handlerAI } from "src/utils/voiceNoteHandler";
 
 export default async (
 	ctx: BotContext,
@@ -14,6 +15,8 @@ export default async (
 ) => {
 	const ai = extensions.ai as AIClass;
 	const history = getHistoryParse(state);
+
+  const audioContent = await handlerAI(ctx);
 	const prompt = `
   Deberás analizar detenidamente el historial de conversación para identificar señales clave que indiquen la intención del cliente. Las señales pueden incluir, pero no se limitan a, preguntas específicas sobre productos, solicitudes de recomendaciones, inquietudes sobre opciones de pago, y expresiones directas de deseo de comprar.
   
@@ -30,10 +33,13 @@ export default async (
   
   Esto dijo el cliente: {HISTORY}
 
+  si envia un audio aqui abajo se guardará
+  {{AUDIO_CONTENT}}
+
   Respuesta ideal (ORDENAR|CONVERSAR|CONFIRMAR|ENTRENAR):`.replace(
 		"{HISTORY}",
 		history
-	);
+	).replace("{AUDIO_CONTENT}", audioContent);
 
 	console.log("historial de main layer: ", history);
 	const text = await ai.createChat([
@@ -42,7 +48,6 @@ export default async (
 			content: prompt,
 		},
 	]);
-	console.log("text de main layer: ", text);
 	try {
 		if (text.includes("CONVERSAR")) {
 			console.log("Flow Triggered: CONVERSAR");
