@@ -11,9 +11,15 @@ dependencies:
   '@bot-whatsapp/provider-baileys':
     specifier: 0.1.3-alpha.16
     version: 0.1.3-alpha.16
+  '@ffmpeg-installer/ffmpeg':
+    specifier: ^1.1.0
+    version: 1.1.0
   dotenv:
     specifier: ^16.4.4
     version: 16.4.5
+  fluent-ffmpeg:
+    specifier: ^2.1.2
+    version: 2.1.2
   google-auth-library:
     specifier: ^9.6.3
     version: 9.6.3
@@ -28,6 +34,9 @@ devDependencies:
   '@rollup/plugin-terser':
     specifier: ^0.4.4
     version: 0.4.4(rollup@4.12.0)
+  '@types/fluent-ffmpeg':
+    specifier: ^2.1.24
+    version: 2.1.24
   eslint:
     specifier: ^8.52.0
     version: 8.57.0
@@ -937,6 +946,12 @@ packages:
       '@types/serve-static': 1.15.5
     dev: false
 
+  /@types/fluent-ffmpeg@2.1.24:
+    resolution: {integrity: sha512-g5oQO8Jgi2kFS3tTub7wLvfLztr1s8tdXmRd8PiL/hLMLzTIAyMR2sANkTggM/rdEDAg3d63nYRRVepwBiCw5A==}
+    dependencies:
+      '@types/node': 20.11.21
+    dev: true
+
   /@types/http-errors@2.0.4:
     resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
     dev: false
@@ -974,7 +989,6 @@ packages:
     resolution: {integrity: sha512-/ySDLGscFPNasfqStUuWWPfL78jompfIoVzLJPVVAHBh6rpG68+pI2Gk+fNLeI8/f1yPYL4s46EleVIc20F1Ow==}
     dependencies:
       undici-types: 5.26.5
-    dev: false
 
   /@types/polka@0.5.7:
     resolution: {integrity: sha512-TH8CDXM8zoskPCNmWabtK7ziGv9Q21s4hMZLVYK5HFEfqmGXBqq/Wgi7jNELWXftZK/1J/9CezYa06x1RKeQ+g==}
@@ -2821,7 +2835,6 @@ packages:
 
   /undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
-    dev: false
 
   /universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}

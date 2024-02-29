@@ -1,18 +1,20 @@
-import { BotContext, BotMethods } from "@bot-whatsapp/bot/dist/types"
+import { BotContext, BotMethods } from "@bot-whatsapp/bot/dist/types";
 
-import AIClass from "src/ai/ai.class"
+import AIClass from "src/ai/ai.class";
 
-import { conversationFlow } from "src/flows/conversation.flow"
-import { getHistoryParse } from "../utils/handleHistory"
-import { confirmFlow } from "src/flows/confirm.flow"
-import { orderFlow } from "src/flows/order.flow"
-import { trainingFlow } from "src/flows/training.flow"
+import { conversationFlow } from "src/flows/conversation.flow";
+import { getHistoryParse } from "../utils/handleHistory";
+import { confirmFlow } from "src/flows/confirm.flow";
+import { orderFlow } from "src/flows/order.flow";
+import { trainingFlow } from "src/flows/training.flow";
 
-export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods) => {
-  const ai = extensions.ai as AIClass
-  const history = getHistoryParse(state)
-  const prompt =
-  `
+export default async (
+	ctx: BotContext,
+	{ state, gotoFlow, extensions }: BotMethods
+) => {
+	const ai = extensions.ai as AIClass;
+	const history = getHistoryParse(state);
+	const prompt = `
   Deberás analizar detenidamente el historial de conversación para identificar señales clave que indiquen la intención del cliente. Las señales pueden incluir, pero no se limitan a, preguntas específicas sobre productos, solicitudes de recomendaciones, inquietudes sobre opciones de pago, y expresiones directas de deseo de comprar.
   
   Posibles acciones a realizar:
@@ -28,34 +30,37 @@ export default async (_: BotContext, { state, gotoFlow, extensions }: BotMethods
   
   Esto dijo el cliente: {HISTORY}
 
-  Respuesta ideal (ORDENAR|CONVERSAR|CONFIRMAR|ENTRENAR):`.replace('{HISTORY}', history)
+  Respuesta ideal (ORDENAR|CONVERSAR|CONFIRMAR|ENTRENAR):`.replace(
+		"{HISTORY}",
+		history
+	);
 
-  console.log('historial de main layer: ', history)
-  const text = await ai.createChat([
-    {
-      role: 'system',
-      content: prompt
-    }
-  ])
-console.log('text de main layer: ', text )
- try {
-    if (text.includes('CONVERSAR')) {
-      console.log('Flow Triggered: CONVERSAR');
-      return gotoFlow(conversationFlow);
-    }
-    if (text.includes('ORDENAR')) {
-        console.log('Flow Triggered: ORDENAR');
-        return gotoFlow(orderFlow);
-    }
-    if (text.includes('CONFIRMAR')) {
-        console.log('Flow Triggered: CONFIRMAR');
-        return gotoFlow(confirmFlow);
-    }
-    if(text.includes('ENTRENAR')){
-      console.log('Flow Triggered: ENTRENAR');
-      return gotoFlow(trainingFlow);
-    }
-  } catch (err) {
-    console.log(`[ERROR]:`, err);
-  }
-}
+	console.log("historial de main layer: ", history);
+	const text = await ai.createChat([
+		{
+			role: "system",
+			content: prompt,
+		},
+	]);
+	console.log("text de main layer: ", text);
+	try {
+		if (text.includes("CONVERSAR")) {
+			console.log("Flow Triggered: CONVERSAR");
+			return gotoFlow(conversationFlow);
+		}
+		if (text.includes("ORDENAR")) {
+			console.log("Flow Triggered: ORDENAR");
+			return gotoFlow(orderFlow);
+		}
+		if (text.includes("CONFIRMAR")) {
+			console.log("Flow Triggered: CONFIRMAR");
+			return gotoFlow(confirmFlow);
+		}
+		if (text.includes("ENTRENAR")) {
+			console.log("Flow Triggered: ENTRENAR");
+			return gotoFlow(trainingFlow);
+		}
+	} catch (err) {
+		console.log(`[ERROR]:`, err);
+	}
+};
