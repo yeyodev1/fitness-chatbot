@@ -5,7 +5,9 @@ import {
 	handleHistory,
 	getHistoryParse,
 } from "../utils/handleHistory";
+import typing from '../utils/texting'
 import GoogleSheetService from "src/services/sheet.js";
+import { BotContext } from "@bot-whatsapp/bot/dist/types";
 
 const googleSheet = new GoogleSheetService(
 	"1YgBJtpwwtfJlUzgzuPS-M6Z2CMGXvhFZ90ojH6300fs"
@@ -50,19 +52,21 @@ const generateJsonParseForPayment = (history: any, name: string, email: string, 
  * Flujo para manejar el proceso de pago
  */
 const confirmFlow = addKeyword("pay")
-	.addAction(async (_, { state, flowDynamic }) => {
-		await flowDynamic("Por favor, introduce tu email:");
+	.addAction(async (ctx: any, ctxFn: any ) => {
+		await typing(ctx, ctxFn.provider)
+		await ctxFn.flowDynamic("Por favor, introduce tu email:");
 		await handleHistory(
 			{ role: "system", content: "Por favor, introduce tu email:" },
-			state
+			ctxFn.state
 		);
 	})
 	.addAction(
 		{ capture: true },
-		async (ctx, { state, flowDynamic, fallBack }) => {
+		async (ctx: any, { state, flowDynamic, fallBack, provider }) => {
 			if (ctx.body.includes("@") && ctx.body.includes(".")) {
 				await state.update({ email: ctx.body });
 				await handleHistory({ role: "user", content: ctx.body }, state);
+				await typing(ctx, provider)
 				await flowDynamic("Ahora, necesito tu nombre:");
 				await handleHistory(
 					{ role: "system", content: "Ahora, necesito tu nombre:" },
