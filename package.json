@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "type": "module",
   "scripts": {
-    "start": "node dist/app.js",
+    "start": "tsx src/app.ts",
     "dev": "tsx src/app.ts",
     "build": "rollup -c",
     "lint": "eslint . --ext .ts"
