@@ -5,7 +5,10 @@ import {
 	handleHistory,
 	getHistoryParse,
 } from "../utils/handleHistory";
+import typing from '../utils/texting'
 import GoogleSheetService from "src/services/sheet.js";
+import { BotContext } from "@bot-whatsapp/bot/dist/types";
+import { generateTimer } from "src/utils/timer";
 
 const googleSheet = new GoogleSheetService(
 	"1YgBJtpwwtfJlUzgzuPS-M6Z2CMGXvhFZ90ojH6300fs"
@@ -50,83 +53,85 @@ const generateJsonParseForPayment = (history: any, name: string, email: string, 
  * Flujo para manejar el proceso de pago
  */
 const confirmFlow = addKeyword("pay")
-	.addAction(async (_, { state, flowDynamic }) => {
-		await flowDynamic("Por favor, introduce tu email:");
+	.addAction(async (ctx: any, ctxFn: any ) => {
+		await typing(ctx, ctxFn.provider)
+		await ctxFn.flowDynamic([{body:"Por favor, introduce tu dirección de correo electrónico:", delay: generateTimer(300, 850)}]);
 		await handleHistory(
-			{ role: "system", content: "Por favor, introduce tu email:" },
-			state
+			{ role: "system", content: "Por favor, introduce tu dirección de correo electrónico:" },
+			ctxFn.state
 		);
 	})
 	.addAction(
 		{ capture: true },
-		async (ctx, { state, flowDynamic, fallBack }) => {
+		async (ctx: any, { state, flowDynamic, fallBack, provider }) => {
 			if (ctx.body.includes("@") && ctx.body.includes(".")) {
 				await state.update({ email: ctx.body });
 				await handleHistory({ role: "user", content: ctx.body }, state);
-				await flowDynamic("Ahora, necesito tu nombre:");
+				await typing(ctx, provider)
+				await flowDynamic([{body:"Ahora, necesito que me facilites tu nombre:", delay: generateTimer(300, 850)}]);
 				await handleHistory(
-					{ role: "system", content: "Ahora, necesito tu nombre:" },
+					{ role: "system", content: "Ahora, necesito que me facilites tu nombre:" },
 					state
 				);
 			} else {
 				return fallBack(
-					"El email proporcionado no es válido. Por favor, introduce un email válido:"
+					"El correo electrónico proporcionado no es válido. Por favor, introduce un correo electrónico válido:"
 				);
 			}
 		}
 	)
 	.addAction(
 		{ capture: true },
-		async (ctx, { state, flowDynamic, fallBack }) => {
+		async (ctx: any, { state, flowDynamic, fallBack, provider }) => {
 			if (ctx.body.trim().split(" ").length > 1) {
 				await state.update({ name: ctx.body.trim() });
 				await handleHistory(
 					{ role: "user", content: ctx.body.trim() },
 					state
 				);
-				await flowDynamic("Por último, ingresa tu cédula:");
+				await typing(ctx, provider)
+				await flowDynamic([{body:"Finalmente, proporciona tu número de identificación:", delay: generateTimer(300, 850)}]);
 				await handleHistory(
 					{
 						role: "system",
-						content: "Por último, ingresa tu cédula:",
+						content: "Finalmente, proporciona tu número de identificación:",
 					},
 					state
 				);
 			} else {
 				return fallBack(
-					"Por favor, introduce tu nombre y apellido:"
+					"Por favor, proporciona tu nombre y apellidos:"
 				);
 			}
 		}
 	)
 	.addAction(
 		{ capture: true },
-		async (ctx, { state, flowDynamic, fallBack }) => {
+		async (ctx: any, { state, flowDynamic, fallBack, provider }) => {
 			if (ctx.body.trim().length > 8) {
 				await state.update({ identification: ctx.body.trim() });
 				await handleHistory(
 					{ role: "user", content: ctx.body.trim() },
 					state
 				);
-				await flowDynamic(
-					"Gracias por proporcionar tus datos, estoy generando tu link de pago"
-				);
+				await typing(ctx, provider)
+				await flowDynamic([{body:"Gracias por facilitarnos tus datos, estamos generando tu enlace de pago.", delay: generateTimer(300, 850)}]);
 				await handleHistory(
 					{
 						role: "system",
 						content:
-							"Gracias por proporcionar tus datos, estoy generando tu link de pago",
+							"Gracias por facilitarnos tus datos, estamos generando tu enlace de pago.",
 					},
 					state
 				);
 			} else {
 				return fallBack(
-					"La cédula debe tener más de 8 dígitos. Por favor, reintroduce tu cédula:"
+					"El número de identificación debe ser mayor a 8 dígitos. Por favor, vuelve a ingresarla:"
 				);
 			}
 		}
 	)
-	.addAction(async (ctx, { state, flowDynamic, extensions }) => {
+	.addAction(async (ctx: any, { state, flowDynamic, extensions, provider }) => {
 		const email = state.get("email");
 		const name = state.get("name");
 		const identification = state.get("identification");
@@ -177,9 +182,8 @@ const confirmFlow = addKeyword("pay")
 		
 		// clearHistory(state);
 		console.log('Historial de conversación limpio', state.getAllState());
-	
-		
-		await flowDynamic('Listo!, tu pedido se agendó, pronto un agente se contactará contigo para hacer la entrega. Gracias por tu compra! 🍕🚀🎉');
+		await typing(ctx, provider)
+		await flowDynamic([{body:"¡Hecho! Tu pedido ha sido programado; pronto un representante se pondrá en contacto contigo para coordinar la entrega. ¡Agradecemos tu compra! 🚀🎉", delay: generateTimer(300, 850)}]);
 	});
 	
 
